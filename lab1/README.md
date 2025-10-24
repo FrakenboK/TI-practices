@@ -334,7 +334,7 @@ file.info("mytest.R")
              size isdir mode               mtime               ctime
     mytest.R    0 FALSE  666 2025-10-25 01:43:16 2025-10-25 01:43:16
                            atime exe uname  udomain
-    mytest.R 2025-10-25 01:43:16  no xxxer ALDERSON
+    mytest.R 2025-10-25 01:43:16  no FrakenboK ALDERSON
 
 Переименуем созданный файл в `mytest2.R`:
 
