@@ -1,0 +1,9 @@
+"0","x <- 5 + 7"
+"2","
+| Almost! Try again. Or, type info() for more options.
+"
+"2","
+| Type y <- x - 3 and press Enter. Whether you use x - 3 or x-3 is personal preference, but it's good habit to include a space on either side of the assignment
+| operator.
+
+"

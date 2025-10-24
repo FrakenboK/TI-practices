@@ -1,0 +1,33 @@
+{
+    "id": "40FFFCD5",
+    "path": "~/TI-practices/lab1/lab1.qmd",
+    "project_path": "lab1.qmd",
+    "type": "quarto_markdown",
+    "hash": "4249161563",
+    "contents": "",
+    "dirty": true,
+    "created": 1761332127580.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "rmdVisualMode": "true",
+        "rmdVisualWrapConfigured": "true",
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "190,0",
+        "scrollLine": "206",
+        "docOutlineVisible": "1",
+        "rmdVisualCollapsedChunks": "",
+        "rmdVisualModeLocation": "3182:5062.72705078125",
+        "docOutlineSize": "257"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1761345788,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1761345838028,
+    "read_only": false,
+    "read_only_alternatives": []
+}
