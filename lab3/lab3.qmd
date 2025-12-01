@@ -1,0 +1,200 @@
+---
+title: "Практическая работа №3. Основы обработки данных с помощью R и Dplyr"
+author: "kobyakmihail@yandex.ru"
+format: 
+  md:
+    output-file: README.md
+---
+
+## Цель работы
+
+1. Развить практические навыки использования языка программирования R для обработки данных 
+2. Закрепить знания базовых типов данных языка R 
+3. Развить практические навыки использования функций обработки данных пакета `dplyr` – функции `select(), filter(), mutate(), arrange(), group_by()`
+
+## Исходные данные
+
+1.  Программное обеспечение Windows 11
+2.  Интерпретатор языка R v4.5.1
+3.  Rstudio IDE
+
+## Подготовка к выполнению задания 
+
+Установим пакет `nycflights13`:
+```
+> install.packages('nycflights13')
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.5/nycflights13_1.0.2.zip'
+Content type 'application/zip' length 4511564 bytes (4.3 MB)
+downloaded 4.3 MB
+
+package ‘nycflights13’ successfully unpacked and MD5 sums checked
+
+The downloaded binary packages are in
+	C:\Users\FrakenboK\AppData\Local\Temp\RtmpkrieeV\downloaded_packages
+```
+
+Произведем загрузку библиотеки `nycflights13` и `dplyr`:
+```{r, warning=FALSE, message=FALSE}
+library(nycflights13)
+library(dplyr)
+```
+
+## Шаги
+
+### 1. Сколько встроенных в пакет `nycflights13` датафреймов?
+
+```{r}
+dataframes <- data(package = "nycflights13")$results[, "Item"]
+
+dataframes
+length(dataframes)
+```
+
+### 2. Сколько строк в каждом датафрейме?
+
+```{r}
+airlines %>% 
+    nrow()
+
+airports %>% 
+    nrow()
+
+flights %>% 
+    nrow()
+
+planes %>% 
+    nrow()
+
+weather %>% 
+    nrow()
+```
+
+### 3. Сколько столбцов в каждом датафрейме?
+
+```{r}
+airlines %>% 
+    ncol()
+
+airports %>% 
+    ncol()
+
+flights %>% 
+    ncol()
+
+planes %>% 
+    ncol()
+
+weather %>% 
+    ncol()
+```
+
+### 4. Как просмотреть примерный вид датафрейма?
+
+```{r}
+glimpse(airlines)
+glimpse(airports)
+glimpse(flights)
+glimpse(planes)
+glimpse(weather)
+```
+
+### 5. Сколько компаний-перевозчиков (carrier) учитывают эти наборы данных (представлено в наборах данных)?
+
+```{r}
+airlines %>%
+    summarise(unique_carriers = n_distinct(carrier))
+```
+
+### 6. Сколько рейсов принял аэропорт John F Kennedy Intl в мае?
+
+```{r}
+flights %>%
+    filter(
+        dest == "JFK",
+        month == 5
+    ) %>%
+    summarise(total_flights = n())
+```
+
+### 7. Какой самый северный аэропорт?
+
+```{r}
+airports %>%
+    filter(lat == max(lat, na.rm = TRUE)) %>%
+    select(name, lat)
+```
+
+### 8. Какой аэропорт самый высокогорный (находится выше всех над уровнем моря)?
+
+```{r}
+airports %>%
+    filter(alt == max(alt, na.rm = TRUE))%>%
+    select(name, alt)
+```
+
+### 9. Какие бортовые номера у самых старых самолетов?
+
+```{r}
+planes %>%
+    filter(year == min(year, na.rm = TRUE)) %>%
+    select(tailnum, year) %>%
+    arrange(tailnum)
+```
+
+### 10. Какая средняя температура воздуха была в сентябре в аэропорту John F Kennedy Intl (в градусах Цельсия)
+
+Воспользуемся формулой перевода градусов: `temp_c = (temp_f - 32) * 5/9`
+
+```{r}
+jfk_september <- weather %>%
+    filter(
+        origin == "JFK",
+        month == 9,
+        !is.na(temp)
+    )
+
+jfk_september_celsius <- jfk_september %>%
+    mutate(
+        temp_c = (temp - 32) * 5/9
+    )
+
+jfk_september_celsius %>%
+    summarise(
+        avg_temp_c = mean(temp_c, na.rm = TRUE)
+    )
+```
+
+### 11. Самолеты какой авиакомпании совершили больше всего вылетов в июне?
+
+```{r}
+flights %>% 
+    filter(month == 6) %>% 
+    count(carrier, sort = TRUE) %>% 
+    slice(1) %>% 
+    left_join(airlines, by = "carrier") %>% 
+    rename(departures = n) %>% 
+    select(name, departures)
+```
+
+### 12. Самолеты какой авиакомпании задерживались чаще других в 2013 году?
+
+```{r}
+flights %>%
+    filter(
+        year == 2013,
+        dep_delay > 0,
+        arr_delay > 0
+    ) %>%
+    group_by(carrier) %>%
+    summarise(n = n()) %>%
+    rename(count = n) %>% 
+    arrange(desc(count)) %>% 
+    left_join(airlines, by = "carrier")%>%
+    head(1) %>%
+    select(name)
+```
+
+## Вывод
+
+В данной работе мы познакомились с пакетом `dplyr` на примере анализа датасетов из пакета `nycflights13`
