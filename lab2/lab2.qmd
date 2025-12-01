@@ -1,0 +1,153 @@
+---
+title: "Практическая работа №2. Основы обработки данных с помощью R и Dplyr"
+author: "kobyakmihail@yandex.ru"
+format: 
+  md:
+    output-file: README.md
+---
+
+## Цель работы
+
+1. Развить практические навыки использования языка программирования R для обработки данных 
+2. Закрепить знания базовых типов данных языка R 
+3. Развить практические навыки использования функций обработки данных пакета `dplyr` – функции `select(), filter(), mutate(), arrange(), group_by()`
+
+## Исходные данные
+
+1.  Программное обеспечение Windows 11
+2.  Интерпретатор языка R v4.5.1
+3.  Rstudio IDE
+
+## Подготовка к выполнению задания 
+
+Произведем загрузку библиотеки `dplyr`:
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+```
+
+## Шаги
+
+### 1. Сколько строк в датафрейме?
+
+Воспользуемся функцией `nrow`:
+
+```{r}
+starwars %>% nrow()
+```
+
+### 2. Сколько столбцов в датафрейме?
+
+Воспользуемся функцией `ncol`:
+
+```{r}
+starwars %>% ncol()
+```
+
+### 3. Как просмотреть примерный вид датафрейма?
+
+Воспользуемся функцией `glimpse`:
+
+```{r}
+starwars %>% glimpse()
+```
+
+### 4. Сколько уникальных рас персонажей (species) представлено в данных?
+
+Воспользуемся функцией `distinct` для выбора уникальных значений и `nrow` для последующего подсчета количества строк:
+
+```{r}
+starwars %>% 
+    distinct(species) %>% 
+    nrow()
+```
+
+### 5. Найти самого высокого персонажа
+
+Воспользуемся функциями `filter` и `max`:
+
+```{r}
+starwars %>% 
+    filter(height == max(height, na.rm = TRUE))
+```
+
+### 6. Найти всех персонажей ниже 170
+
+Воспользуемся функциями `filter` и `arrange`:
+
+```{r}
+starwars %>% 
+    filter(height < 170) %>% 
+    arrange(height)
+```
+
+### 7. Подсчитать ИМТ (индекс массы тела) для всех персонажей. ИМТ подсчитать по формуле `I = m / h ^ 2`, где `m` – масса (weight), а `h` – рост (height).
+
+Сохраним в поле `height_m` значение роста в метрах, далее для модификации исходного датафрейма воспользуемся функцией `mutate`:
+
+```{r}
+starwars %>% 
+    mutate(
+        height_m = height / 100,
+        bmi = mass / (height_m ^ 2)
+    ) %>% 
+    arrange(desc(bmi)) %>%
+    select(name, mass, height, height_m, bmi)
+```
+
+### 8. Найти 10 самых "вытянутых" персонажей. "Вытянутость" оценить по отношению массы (mass) к росту (height) персонажей.
+
+Воспользуемся функцией `filter` для отбора существующих значений, функцию `mutate` для добавления поля "вытянутости" `elongation`, а также `slice_max` для отбора максимпольных значений поля "вытянутости":
+
+```{r}
+starwars %>% 
+    filter(!is.na(mass), !is.na(height)) %>%
+    mutate(
+        elongation = mass / (height / 100)
+    ) %>% 
+    select(name, mass, height, elongation) %>%
+    slice_max(elongation, n = 10)
+```
+
+### 9. Найти средний возраст персонажей каждой расы вселенной Звездных войн
+
+Воспользуемся функциями `filter` для отбора существующих значений, `group_by`, `summarise`, `mean` и `arrange`:
+
+```{r}
+starwars %>% 
+    filter(!is.na(species), !is.na(birth_year)) %>%
+    group_by(species) %>%
+    summarise(
+        count = n(),
+        avg_birth_year = mean(birth_year, na.rm = TRUE)
+    ) %>% 
+    arrange(desc(avg_birth_year))
+```
+
+### 10. Найти средний возраст персонажей каждой расы вселенной Звездных войн
+
+Воспользуемся функцией `count`, её атрибутом `sort` и функцией `head`:
+
+```{r}
+starwars %>%
+    count(eye_color, sort = TRUE) %>%
+    head(1)
+```
+
+### 11. Подсчитать среднюю длину имени в каждой расе вселенной Звездных войн
+
+Воспользуемся функциями `filter`, `mutate`, `group_by` и `summarise`:
+
+```{r}
+starwars %>%
+    filter(!is.na(species), !is.na(name)) %>%
+    mutate(name_length = nchar(name)) %>%
+    group_by(species) %>%
+    summarise(
+        count = n(),
+        avg_length = mean(name_length)
+    )
+```
+
+## Вывод
+
+В данной работе мы познакомились с пакетом `dplyr` на примере анализа датасета `starwars`
